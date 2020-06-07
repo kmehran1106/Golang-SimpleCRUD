@@ -1,29 +1,21 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"simple-crud/database"
+	"simple-crud/product"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
-// START - Handle Request Using Struct and ServeHTTP Method
-type fooHandler struct {
-	Message string
-}
-
-func (f *fooHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(f.Message))
-}
-// END - Handle Request Using Struct and ServeHTTP Method
-
-
-// START - Handle Request Using Function
-func barHandler(w http.ResponseWriter, r *http.Request){
-	w.Write([]byte("Grr!"))
-}
-
+const basePath = "/api"
 
 func main() {
-	http.Handle("/foo", &fooHandler{Message: "Meow!"})
-	http.HandleFunc("/bar", barHandler)
-
-	http.ListenAndServe(":5000", nil)
+	database.SetupDatabase()
+	product.SetupRoutes(basePath)
+	err := http.ListenAndServe(":5000", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
