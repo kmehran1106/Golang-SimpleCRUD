@@ -8,8 +8,15 @@ import (
 
 // SetupRoutes :
 func SetupRoutes(apiBasePath string) {
-	productsHandler := http.HandlerFunc(HandlerProductListCreate)
-	productHandler := http.HandlerFunc(HandleProductDetailUpdateDelete)
-	http.Handle(fmt.Sprintf("%s/%s", apiBasePath, productsPath), cors.Middleware(productsHandler))
-	http.Handle(fmt.Sprintf("%s/%s/", apiBasePath, productsPath), cors.Middleware(productHandler))
+	productListCreateHandler := http.HandlerFunc(handlerProductListCreate)
+	productDetailUpdateDeleteHandler := http.HandlerFunc(handleProductDetailUpdateDelete)
+
+	http.Handle(
+		fmt.Sprintf("%s/%s", apiBasePath, productsPath),
+		cors.Middleware(productListCreateHandler),
+	)
+	http.Handle(
+		fmt.Sprintf("%s/%s/", apiBasePath, productsPath),
+		cors.Middleware(productDetailUpdateDeleteHandler),
+	)
 }
