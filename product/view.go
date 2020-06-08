@@ -2,8 +2,10 @@ package product
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 )
 
 const productsPath = "products"
@@ -25,8 +27,24 @@ func handlerProductListCreate(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 	case http.MethodPost:
+		var product Product
+		if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
+			log.Print(err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		currentTime := time.Now().Format("2006-01-02 15:04:05")
+		product.CreatedAt = currentTime
+		product.ModifiedAt = currentTime
+
+		productID, err := createProductItem(product)
+		if err != nil {
+			log.Print(err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte("In Detail"))
+		w.Write([]byte(fmt.Sprintf(`{"productId":%d}`, productID)))
 	case http.MethodOptions:
 		return
 	default:
